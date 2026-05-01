@@ -1,0 +1,16 @@
+# Mnemotron Wiki for Research — Python dependencies
+# Install with:  pip install -r scripts/requirements.txt
+
+# Text extraction
+pdfminer.six        # PDF text layer extraction
+python-docx         # .docx / .odt reading
+beautifulsoup4      # HTML parsing
+lxml                # Fast HTML/XML parser (used by BeautifulSoup)
+
+# OCR — offline
+Pillow              # Image format conversion (TIFF → JPEG, multi-page TIFF)
+pytesseract         # Python wrapper for Tesseract OCR engine
+pdf2image           # PDF page → image rasterizer (requires poppler system package)
+
+# OCR — Claude Vision fallback
+anthropic           # Anthropic SDK for Claude Vision API calls
