@@ -9,7 +9,7 @@ Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
 Full license text: https://www.gnu.org/licenses/fdl.html
 -->
 
-# Mnemotron Wiki for Research
+# Mnemotron Wiki for Research ("Mnemotron-R")
 
 A Claude-powered knowledge base for managing a research corpus. Drop source
 documents into `ingest/` and Claude processes them into a structured,
