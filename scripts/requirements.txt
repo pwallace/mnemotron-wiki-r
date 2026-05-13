@@ -14,3 +14,6 @@ pdf2image           # PDF page → image rasterizer (requires poppler system pac
 
 # OCR — Claude Vision fallback
 anthropic           # Anthropic SDK for Claude Vision API calls
+
+# Static HTML export
+markdown            # Markdown → HTML (wiki_export.py)

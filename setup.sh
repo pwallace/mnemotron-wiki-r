@@ -66,6 +66,35 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# Claude project permissions (required for background synthesis agents)
+# ---------------------------------------------------------------------------
+
+if [ ! -f ".claude/settings.json" ]; then
+  mkdir -p .claude
+  cat > .claude/settings.json <<'EOF'
+{
+  "permissions": {
+    "allow": [
+      "Edit",
+      "Write",
+      "Bash(grep*)",
+      "Bash(find*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(wc*)",
+      "Bash(ls*)"
+    ]
+  }
+}
+EOF
+  echo "Created .claude/settings.json  (enables background agents to edit wiki files)"
+else
+  echo ".claude/settings.json already exists — skipping."
+fi
+
+# ---------------------------------------------------------------------------
 # Initialize manifest
 # ---------------------------------------------------------------------------
 
@@ -106,4 +135,7 @@ echo "  2. Run the ingest task:  tell Claude 'run the research wiki ingest task'
 echo "     (Claude reads RESEARCH_WIKI_TASK.md for instructions)"
 echo "  3. For scanned PDFs or image files, ensure Tesseract and poppler are"
 echo "     installed, and set ANTHROPIC_API_KEY for the Claude Vision fallback."
+echo "  4. To export the wiki to static HTML:"
+echo "       python wiki_export.py"
+echo "     Output goes to wiki-export/index.html  (no server needed)."
 echo

@@ -9,7 +9,7 @@ Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
 Full license text: https://www.gnu.org/licenses/fdl.html
 -->
 
-# Mnemotron Wiki for Research ("Mnemotron-R")
+# Mnemotron Wiki for Research
 
 A Claude-powered knowledge base for managing a research corpus. Drop source
 documents into `ingest/` and Claude processes them into a structured,
@@ -31,8 +31,9 @@ PDFs are discarded after ingest.
 7. [Wiki structure](#7-wiki-structure)
 8. [Configuration reference](#8-configuration-reference)
 9. [Script reference](#9-script-reference)
-10. [Troubleshooting](#10-troubleshooting)
-11. [License](#11-license)
+10. [Exporting to HTML](#10-exporting-to-html)
+11. [Troubleshooting](#11-troubleshooting)
+12. [License](#12-license)
 
 ---
 
@@ -686,7 +687,37 @@ result = ocr_file(Path("scan.tiff"), hint="auto")
 
 ---
 
-## 10. Troubleshooting
+## 10. Exporting to HTML
+
+`wiki_export.py` converts the wiki to a self-contained static HTML site —
+no server required. Open `wiki-export/index.html` directly in a browser, or
+host the output folder on any static file host (GitHub Pages, S3, Netlify, etc.).
+
+```bash
+python wiki_export.py                                    # topics + entities + index docs
+python wiki_export.py --all                              # + all source pages
+python wiki_export.py --clean                            # wipe output dir first
+python wiki_export.py --site-name "My Research Wiki"     # custom site name
+python wiki_export.py --copyright "© 2026 Jane Smith"   # add copyright to footer
+python wiki_export.py --css my-styles.css                # use custom stylesheet
+python wiki_export.py -o /path/to/output                 # custom output dir
+```
+
+Source pages are excluded by default — large corpora can contain thousands of
+them. Use `--all` or `--sources` to include them.
+
+The footer of every page attributes the export to Mnemotron-R. Use
+`--copyright` to prepend your own copyright notice. For full visual
+customization, supply a replacement stylesheet with `--css`.
+
+Add `wiki-export/` to your `.gitignore` if you do not want to commit the
+generated output to the main branch. To publish via GitHub Pages, push the
+contents of `wiki-export/` to a `gh-pages` branch, or rename the output
+directory to `docs/` and configure Pages to serve from `main/docs`.
+
+---
+
+## 11. Troubleshooting
 
 ### `tesseract: command not found`
 
@@ -783,7 +814,7 @@ garbled from OCR:
 
 ---
 
-## 11. License
+## 12. License
 
 **Code** (`scripts/*.py`, `batch_ingest.py`, `ia_ingest.py`,
 `synthesize_links.py`, `setup.sh`):  
