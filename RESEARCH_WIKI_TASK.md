@@ -520,6 +520,23 @@ updated: YYYY-MM-DD
 | filename.ext | YYYY-MM-DD | [slug](sources/slug.md) |
 ```
 
+After rewriting INDEX.md, run the two index maintenance scripts:
+
+```bash
+# Regenerate the consolidated open questions list from all topic pages
+python scripts/open_questions.py
+
+# Update Related Topics sections on source pages
+python synthesize_links.py
+# or, after adding new topic pages, to regenerate all sections:
+python synthesize_links.py --rebuild
+```
+
+`open_questions.py` writes `wiki/OPEN-QUESTIONS.md` automatically — do not
+edit that file by hand.  `synthesize_links.py` without `--rebuild` only adds
+sections to pages that lack one; `--rebuild` strips and regenerates all
+sections (slower, but necessary after adding or renaming topic pages).
+
 ---
 
 ## Stage 3: Git Commit
@@ -560,13 +577,14 @@ Check for a compiled open questions document:
 
 ```bash
 cat wiki/OPEN-QUESTIONS.md
+# or for a quick count by topic:
+python scripts/open_questions.py --count
 ```
 
-If this file does not exist, scan the `## Open Questions` sections across all
-topic pages:
+If the file is missing or stale, regenerate it:
 
 ```bash
-grep -h -A 30 "^## Open Questions" wiki/topics/*.md | grep "^- " | sort -u
+python scripts/open_questions.py
 ```
 
 Select 2–4 questions that are:
@@ -599,10 +617,36 @@ existing topic pages. See the **Additive editing rule** in Style notes below.
 ### 4.4 Parallel agents for independent questions
 
 When two or more open questions are independent, launch them as parallel
-background agents. Each agent should:
+background agents. Use the **agent manifest** to prevent concurrent edit
+conflicts:
+
+```bash
+# Before launching: check whether target pages are already claimed
+python scripts/agent_manifest.py check wiki/topics/TARGET.md
+
+# At agent start: claim the pages this agent will edit
+python scripts/agent_manifest.py claim AGENT_ID "Depth pass: description" \
+    wiki/topics/TARGET.md [wiki/topics/OTHER.md ...]
+
+# At agent finish: release the claim
+python scripts/agent_manifest.py release AGENT_ID
+
+# If a prior run crashed without releasing:
+python scripts/agent_manifest.py prune --hours 4
+
+# Show all active agents:
+python scripts/agent_manifest.py list
+```
+
+The manifest lives at `wiki/.agent-manifest.json`. Claims expire automatically
+after 4 hours (`STALE_HOURS`) to handle crashed agents. `check` exits non-zero
+if a conflict exists — use this as a gate before launching.
+
+Each agent should:
 - Have one clearly bounded question or subject area in its prompt
 - Target specific named source files or ranges identified by prior grep
 - Write to non-overlapping topic pages where possible
+- Claim its target pages via the manifest at start; release at finish
 - Commit independently with a descriptive message
 
 Provide each agent with the exact grep commands needed to find relevant
@@ -612,17 +656,20 @@ before editing.
 
 ### 4.5 Maintain OPEN-QUESTIONS.md
 
-After Stage 4, update or create `wiki/OPEN-QUESTIONS.md`:
-- Remove questions that are now answered
-- Update partially-answered questions to reflect current knowledge
-- Mark high-priority remaining questions with `**[Priority]**`
-
-If the file does not yet exist, create it by extracting all Open Questions
-bullet points from topic pages, grouped by topic with links:
+After Stage 4, regenerate `wiki/OPEN-QUESTIONS.md`:
 
 ```bash
-grep -h -A 30 "^## Open Questions" wiki/topics/*.md | grep "^- " | sort -u
+python scripts/open_questions.py
 ```
+
+The script reads `## Open Questions` from all topic pages, deduplicates
+within each topic, and rewrites the file. To update the underlying questions,
+**edit the individual topic pages** — changes flow into OPEN-QUESTIONS.md on
+the next run.
+
+After regenerating, review the output and manually remove or reword any
+questions that are now answered or that warrant rephrasing. Then commit with
+Stage 3.
 
 ---
 

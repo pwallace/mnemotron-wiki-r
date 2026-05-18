@@ -322,6 +322,19 @@ def get_title(fm: dict, body: str, stem: str) -> str:
     return stem.replace("-", " ").title()
 
 
+def strip_sources_section(body: str) -> str:
+    """Remove the Sources section (and everything after) from INDEX.md.
+
+    The Sources log in large wikis can contain thousands of rows. Stripping it
+    before rendering keeps index.html fast to load without losing the data
+    (it remains in INDEX.md on disk).
+    """
+    idx = body.find("\n## Sources")
+    if idx != -1:
+        return body[:idx]
+    return body
+
+
 def rewrite_links(text: str) -> str:
     """Rewrite .md → .html in relative markdown link URLs."""
     def _sub(m: re.Match) -> str:
@@ -496,6 +509,9 @@ def export_file(
         out_path = out_dir / section / (src.stem + ".html")
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if src.name == "INDEX.md":
+        body = strip_sources_section(body)
 
     body_with_new_links = rewrite_links(body)
     body_html = md_to_html(body_with_new_links)

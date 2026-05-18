@@ -221,14 +221,14 @@ def _ia_download(
 
     before = {p for p in dest_dir.rglob("*") if p.is_file()}
 
-    dest_dir.mkdir(parents=True, exist_ok=True)
     try:
+        dest_dir.mkdir(parents=True, exist_ok=True)
         result = _ia_run(
             [
                 "download", identifier,
                 f"--glob={glob}",
                 f"--destdir={dest_dir}",
-                "--no-directories",
+                "--no-directory",
             ],
             timeout=timeout,
         )
