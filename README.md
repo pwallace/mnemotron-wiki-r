@@ -18,6 +18,8 @@ pages, and transcribing scanned documents through an offline-first OCR
 pipeline. All source content is retained in markdown; raw scan files and
 PDFs are discarded after ingest.
 
+**Example Application:** [Digest of Hamilton College archival materials](https://github.com/LITS-Digital-Collections-Team/spectator-wiki) to create a "gazetteer", intended for student research on institutional history and also as a knowledge base for AI chat tools (i.e., using Gemini Gems to provide corpus-specific AI search).
+
 ---
 
 ## Contents
